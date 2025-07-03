@@ -1,0 +1,36 @@
+﻿@model List<CyberRiskManager.Models.Riesgo>
+
+<h2>Riesgos identificados</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Nuevo Riesgo</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Activo</th>
+            <th>Amenaza</th>
+            <th>Vuln.</th>
+            <th>P</th>
+            <th>I</th>
+            <th>Nivel</th>
+            <th>Categoría</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Activo?.Nombre</td>
+                <td>@r.Amenaza</td>
+                <td>@r.Vulnerabilidad</td>
+                <td>@r.Probabilidad</td>
+                <td>@r.Impacto</td>
+                <td>@r.Nivel</td>
+                <td>
+                    <span class="badge bg-@(r.Categoria switch { "Crítico" => "danger", "Alto" => "warning", "Medio" => "info", _ => "secondary" })">
+                        @r.Categoria
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -32,4 +32,5 @@ public class ActivosController : Controller
         var activo = _activos.FirstOrDefault(a => a.Id == id);
         return activo == null ? NotFound() : View(activo);
     }
+    public static List<Activo> GetAll() => _activos;
 }
