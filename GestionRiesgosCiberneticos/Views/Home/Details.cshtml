@@ -1,0 +1,15 @@
+﻿@model CyberRiskManager.Models.Activo
+
+<h2>Detalles del Activo</h2>
+
+<table class="table">
+    <tr><th>Nombre:</th><td>@Model.Nombre</td></tr>
+    <tr><th>Tipo:</th><td>@Model.Tipo</td></tr>
+    <tr><th>Descripción:</th><td>@Model.Descripcion</td></tr>
+    <tr><th>C:</th><td>@Model.Confidencialidad</td></tr>
+    <tr><th>I:</th><td>@Model.Integridad</td></tr>
+    <tr><th>D:</th><td>@Model.Disponibilidad</td></tr>
+    <tr><th>Criticidad:</th><td>@Model.Criticidad</td></tr>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

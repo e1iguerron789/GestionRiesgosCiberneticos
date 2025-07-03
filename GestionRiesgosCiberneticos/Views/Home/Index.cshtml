@@ -1,0 +1,24 @@
+﻿@model List<CyberRiskManager.Models.Activo>
+
+<h2>Listado de Activos</h2>
+<a asp-action="Create" class="btn btn-primary">Nuevo Activo</a>
+
+<table class="table">
+    <thead><tr><th>Nombre</th><th>Tipo</th><th>C</th><th>I</th><th>D</th><th>Criticidad</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.Nombre</td>
+                <td>@a.Tipo</td>
+                <td>@a.Confidencialidad</td>
+                <td>@a.Integridad</td>
+                <td>@a.Disponibilidad</td>
+                <td>@a.Criticidad</td>
+                <td><a asp-action="Details" asp-route-id="@a.Id">Ver</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
