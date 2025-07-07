@@ -1,48 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using CyberRiskManager.Data;
 using CyberRiskManager.Models;
-using CyberRiskManager.ViewModels;
 
-namespace CyberRiskManager.Controllers;
-
-public class RiesgosController : Controller
+namespace CyberRiskManager.Controllers
 {
-    // listas en memoria (igual que ActivosController)
-    private static List<Riesgo> _riesgos = new();
-    private static int _nextId = 1;
-
-    // *** Necesitamos también la lista de activos ya creada ***
-    private static List<Activo> Activos => ActivosController.GetAll(); // método helper
-
-    // GET  /Riesgos
-    public IActionResult Index()
+    public class RiesgosController : Controller
     {
-        // une cada riesgo con su activo para mostrar nombre, tipo, etc.
-        var lista = _riesgos.Select(r =>
+        private readonly MongoService _mongo;
+
+        public RiesgosController(MongoService mongo)
         {
-            r.Activo = Activos.FirstOrDefault(a => a.Id == r.ActivoId);
-            return r;
-        }).ToList();
+            _mongo = mongo;
+        }
 
-        return View(lista);
-    }
+        public IActionResult Index()
+        {
+            var riesgos = _mongo.GetRiesgos();
+            var activos = _mongo.GetAll();
 
-    // GET  /Riesgos/Create
-    public IActionResult Create()
-    {
-        var vm = new RiesgoCreateVM(new Riesgo(), Activos);
-        return View(vm);
-    }
+            ViewBag.Activos = activos.ToDictionary(a => a.Id, a => a.Nombre);
+            return View(riesgos);
+        }
 
-    // POST /Riesgos/Create
-    [HttpPost]
-    public IActionResult Create(RiesgoCreateVM vm)
-    {
-        if (!ModelState.IsValid || vm.Riesgo is null)
-            return View(vm);   // redisplay con errores
+        public IActionResult Create()
+        {
+            ViewBag.Activos = _mongo.GetAll();
+            return View(new Riesgo());
+        }
 
-        vm.Riesgo.Id = _nextId++;
-        _riesgos.Add(vm.Riesgo);
-        return RedirectToAction(nameof(Index));
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Riesgo riesgo)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Activos = _mongo.GetAll();
+                return View(riesgo);
+            }
+
+            _mongo.AddRiesgo(riesgo);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
-

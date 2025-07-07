@@ -1,30 +1,40 @@
-﻿// Riesgo.cs
-namespace CyberRiskManager.Models;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public class Riesgo
+namespace CyberRiskManager.Models
 {
-    public int Id { get; set; }
-
-    // Relación al activo
-    public int ActivoId { get; set; }
-    public Activo? Activo { get; set; }   // se rellena a mano en el controlador
-
-    // Datos que ingresa el usuario
-    public string Amenaza { get; set; } = "";
-    public string Vulnerabilidad { get; set; } = "";
-    public string ControlesExistentes { get; set; } = "";
-
-    // Valoración P‑I (1‑3)
-    public int Probabilidad { get; set; }
-    public int Impacto { get; set; }
-
-    // Cálculo automático
-    public int Nivel => Probabilidad * Impacto;       // 1‑9
-    public string Categoria => Nivel switch
+    public class Riesgo
     {
-        >= 9 => "Crítico",
-        >= 6 => "Alto",
-        >= 3 => "Medio",
-        _ => "Bajo"
-    };
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = "";
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ActivoId { get; set; } = "";
+
+        public string Amenaza { get; set; } = "";
+        public string Vulnerabilidad { get; set; } = "";
+        public string ControlesExistentes { get; set; } = "";
+
+        public int Probabilidad { get; set; } = 2;  // 1 a 3
+        public int Impacto { get; set; } = 2;       // 1 a 3
+
+        [BsonIgnore]
+        public int NivelRiesgo => Probabilidad * Impacto;
+
+        [BsonIgnore]
+        public string Prioridad
+        {
+            get
+            {
+                // Sugerencia básica de prioridad
+                if (NivelRiesgo >= 7)
+                    return "Alta prioridad 🔥";
+                else if (NivelRiesgo >= 4)
+                    return "Media prioridad ⚠️";
+                else
+                    return "Baja prioridad ✅";
+            }
+        }
+    }
 }

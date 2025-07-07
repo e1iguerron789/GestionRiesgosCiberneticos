@@ -1,24 +1,31 @@
-﻿namespace CyberRiskManager.Models;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public enum TipoActivo
+namespace CyberRiskManager.Models
 {
-    Hardware,
-    Software,
-    Datos,
-    Servicios,
-    Personas
-}
+    public enum TipoActivo
+    {
+        Hardware,
+        Software,
+        Datos,
+        Servicios,
+        Personas
+    }
 
-public class Activo
-{
-    public int Id { get; set; } // identificador automático
-    public string Nombre { get; set; } = "";
-    public TipoActivo Tipo { get; set; }
-    public string? Descripcion { get; set; }
-    public int Confidencialidad { get; set; }
-    public int Integridad { get; set; }
-    public int Disponibilidad { get; set; }
+    public class Activo
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = "";
 
-    // Calculo automático: criticidad promedio
-    public int Criticidad => (Confidencialidad + Integridad + Disponibilidad) / 3;
+        public string Nombre { get; set; } = "";
+        public TipoActivo Tipo { get; set; }
+        public string? Descripcion { get; set; }
+
+        public int Confidencialidad { get; set; } = 2;
+        public int Integridad { get; set; } = 2;
+        public int Disponibilidad { get; set; } = 2;
+
+        public int Criticidad => (Confidencialidad + Integridad + Disponibilidad) / 3;
+    }
 }

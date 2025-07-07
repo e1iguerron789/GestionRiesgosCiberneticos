@@ -1,35 +1,37 @@
 ﻿@model List<CyberRiskManager.Models.Riesgo>
+@{
+    ViewData["Title"] = "Lista de Riesgos";
+    var activos = ViewBag.Activos as Dictionary<string, string>;
+}
 
-<h2>Riesgos identificados</h2>
-<a asp-action="Create" class="btn btn-primary mb-3">Nuevo Riesgo</a>
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Nuevo riesgo</a>
 
-<table class="table table-striped">
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>Activo</th>
             <th>Amenaza</th>
-            <th>Vuln.</th>
-            <th>P</th>
-            <th>I</th>
-            <th>Nivel</th>
-            <th>Categoría</th>
+            <th>Vulnerabilidad</th>
+            <th>Controles</th>
+            <th>PxI</th>
+            <th>Prioridad</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var r in Model)
         {
+            var activo = activos.ContainsKey(r.ActivoId) ? activos[r.ActivoId] : "(desconocido)";
+            var color = r.NivelRiesgo >= 7 ? "danger"
+            : r.NivelRiesgo >= 4 ? "warning"
+            : "success";
             <tr>
-                <td>@r.Activo?.Nombre</td>
+                <td>@activo</td>
                 <td>@r.Amenaza</td>
                 <td>@r.Vulnerabilidad</td>
-                <td>@r.Probabilidad</td>
-                <td>@r.Impacto</td>
-                <td>@r.Nivel</td>
-                <td>
-                    <span class="badge bg-@(r.Categoria switch { "Crítico" => "danger", "Alto" => "warning", "Medio" => "info", _ => "secondary" })">
-                        @r.Categoria
-                    </span>
-                </td>
+                <td>@r.ControlesExistentes</td>
+                <td><span class="badge bg-@color">@r.NivelRiesgo</span></td>
+                <td>@r.Prioridad</td>
             </tr>
         }
     </tbody>

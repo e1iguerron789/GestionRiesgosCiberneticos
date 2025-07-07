@@ -1,0 +1,62 @@
+﻿@model List<CyberRiskManager.Models.Activo>
+
+@{
+    ViewData["Title"] = "Listado de Activos";
+}
+
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Nuevo Activo</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>C</th>
+            <th>I</th>
+            <th>D</th>
+            <th>Criticidad</th>
+            <th>Descripción Criticidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.Nombre</td>
+                <td>@a.Tipo</td>
+                <td>@a.Confidencialidad</td>
+                <td>@a.Integridad</td>
+                <td>@a.Disponibilidad</td>
+                <td>
+                    @{
+                        var badge = a.Criticidad == 1 ? "success"
+                        : a.Criticidad == 2 ? "warning"
+                        : a.Criticidad == 3 ? "danger"
+                        : "secondary";
+                        var nivel = a.Criticidad == 1 ? "Baja"
+                        : a.Criticidad == 2 ? "Media"
+                        : a.Criticidad == 3 ? "Alta"
+                        : "Desconocido";
+                    }
+                <span class="badge bg-@badge">@nivel</span>
+            </td>
+            <td>
+                @(a.Criticidad == 1 ? "El activo no es especialmente sensible."
+                                : a.Criticidad == 2 ? "Merece atención, pero no es crítico."
+                                : a.Criticidad == 3 ? "Debe ser protegido con prioridad (datos muy sensibles o sistemas críticos)."
+                                : "Sin análisis")
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@a.Id" class="btn btn-sm btn-info">Ver</a>
+                <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-warning">Editar</a>
+                <form asp-action="Delete" asp-route-id="@a.Id" method="post" class="d-inline"
+                      onsubmit="return confirm('¿Eliminar este activo?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+                }
+    </tbody>
+</table>

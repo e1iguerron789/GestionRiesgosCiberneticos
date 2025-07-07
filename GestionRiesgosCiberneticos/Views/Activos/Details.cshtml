@@ -1,0 +1,33 @@
+﻿@model CyberRiskManager.Models.Activo
+
+@{
+    ViewData["Title"] = "Detalles del Activo";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <tr><th>Nombre:</th><td>@Model.Nombre</td></tr>
+    <tr><th>Tipo:</th><td>@Model.Tipo</td></tr>
+    <tr><th>Descripción:</th><td>@Model.Descripcion</td></tr>
+    <tr><th>Confidencialidad:</th><td>@Model.Confidencialidad</td></tr>
+    <tr><th>Integridad:</th><td>@Model.Integridad</td></tr>
+    <tr><th>Disponibilidad:</th><td>@Model.Disponibilidad</td></tr>
+    <tr>
+        <th>Criticidad:</th>
+        <td>
+            @{
+                var nivel = Model.Criticidad switch { 1 => "Baja", 2 => "Media", 3 => "Alta", _ => "?" };
+                var badge = Model.Criticidad switch { 1 => "success", 2 => "warning", 3 => "danger", _ => "secondary" };
+            }
+            <span class="badge bg-@badge">@nivel</span>
+        </td>
+    </tr>
+</table>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline"
+      onsubmit="return confirm('¿Eliminar este activo?');">
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+</form>
+<a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>

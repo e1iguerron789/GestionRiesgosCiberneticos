@@ -1,36 +1,104 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using CyberRiskManager.Data;
 using CyberRiskManager.Models;
 
-namespace CyberRiskManager.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using CyberRiskManager.Data;
+using CyberRiskManager.Models;
+using Microsoft.Extensions.Logging;
 
-public class ActivosController : Controller
+namespace CyberRiskManager.Controllers
 {
-    // Lista simulada en memoria
-    private static List<Activo> _activos = new();
-    private static int _nextId = 1;
-
-    public IActionResult Index()
+    public class ActivosController : Controller
     {
-        return View(_activos); // Lista de activos
-    }
+        private readonly MongoService _mongo;
+        private readonly ILogger<ActivosController> _logger;
 
-    public IActionResult Create()
-    {
-        return View(new Activo()); // Formulario vacío
-    }
+        public ActivosController(MongoService mongo, ILogger<ActivosController> logger)
+        {
+            _mongo = mongo;
+            _logger = logger;
+        }
 
-    [HttpPost]
-    public IActionResult Create(Activo activo)
-    {
-        activo.Id = _nextId++;
-        _activos.Add(activo);
-        return RedirectToAction(nameof(Index)); // Volver a lista
-    }
+        // GET: /Activos
+        public IActionResult Index()
+        {
+            var activos = _mongo.GetAll();
+            return View(activos);
+        }
 
-    public IActionResult Details(int id)
-    {
-        var activo = _activos.FirstOrDefault(a => a.Id == id);
-        return activo == null ? NotFound() : View(activo);
+        // GET: /Activos/Suggest?term=...
+        [HttpGet]
+        public IActionResult Suggest(string term)
+        {
+            var sugerencias = _mongo
+                .GetAll()
+                .Select(a => a.Nombre)
+                .Where(n => n.Contains(term, StringComparison.OrdinalIgnoreCase))
+                .Distinct()
+                .Take(10)
+                .ToList();
+            return Json(sugerencias);
+        }
+
+        // GET: /Activos/Details/{id}
+        public IActionResult Details(string id)
+        {
+            var activo = _mongo.GetById(id);
+            if (activo == null) return NotFound();
+            return View(activo);
+        }
+
+        // GET: /Activos/Create
+        public IActionResult Create()
+        {
+            return View(new Activo());
+        }
+
+        // POST: /Activos/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Activo activo)
+        {
+            if (!ModelState.IsValid) return View(activo);
+            _mongo.Add(activo);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /Activos/Edit/{id}
+        public IActionResult Edit(string id)
+        {
+            var activo = _mongo.GetById(id);
+            if (activo == null) return NotFound();
+            return View(activo);
+        }
+
+        // POST: /Activos/Edit/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(string id, Activo activo)
+        {
+            if (id != activo.Id) return BadRequest();
+            if (!ModelState.IsValid) return View(activo);
+            _mongo.Update(activo);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /Activos/Delete/{id}
+        public IActionResult Delete(string id)
+        {
+            var activo = _mongo.GetById(id);
+            if (activo == null) return NotFound();
+            return View(activo);
+        }
+
+        // POST: /Activos/Delete/{id}
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(string id)
+        {
+            _mongo.Delete(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
-    public static List<Activo> GetAll() => _activos;
 }

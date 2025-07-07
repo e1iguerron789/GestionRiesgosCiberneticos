@@ -1,0 +1,56 @@
+﻿@model CyberRiskManager.Models.Activo
+@using CyberRiskManager.Models
+
+@{
+    ViewData["Title"] = "Editar activo";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    <!-- mismos campos que Create -->
+    <div class="mb-3">
+        <label>Nombre del activo</label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Tipo</label>
+        <select asp-for="Tipo" class="form-select" asp-items="Html.GetEnumSelectList<TipoActivo>()"></select>
+    </div>
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <label>Confidencialidad</label>
+            <input asp-for="Confidencialidad" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'conf')" />
+            <span id="label-conf">@Model.Confidencialidad</span>
+        </div>
+        <div class="col">
+            <label>Integridad</label>
+            <input asp-for="Integridad" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'int')" />
+            <span id="label-int">@Model.Integridad</span>
+        </div>
+        <div class="col">
+            <label>Disponibilidad</label>
+            <input asp-for="Disponibilidad" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'disp')" />
+            <span id="label-disp">@Model.Disponibilidad</span>
+        </div>
+    </div>
+
+    <button class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script>
+        const etiquetas = {1:'Baja 🟢',2:'Media 🟠',3:'Alta 🔴'};
+        function updateLabel(inp,id){ document.getElementById('label-'+id).innerText = etiquetas[inp.value]; }
+        document.addEventListener('DOMContentLoaded', ()=>{
+          updateLabel(document.querySelector('[asp-for="Confidencialidad"]'),'conf');
+          updateLabel(document.querySelector('[asp-for="Integridad"]'),'int');
+          updateLabel(document.querySelector('[asp-for="Disponibilidad"]'),'disp');
+        });
+    </script>
+}
