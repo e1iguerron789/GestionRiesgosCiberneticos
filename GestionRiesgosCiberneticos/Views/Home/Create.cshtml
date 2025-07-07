@@ -1,7 +1,11 @@
 ﻿@model CyberRiskManager.Models.Activo
 @using CyberRiskManager.Models
+@model CyberRiskManager.Models.Activo
+@{
+    ViewData["Title"] = "Registrar Activo";
+}
 
-<h2>Nuevo Activo</h2>
+<h2 class="mb-4">📁 Registrar nuevo Activo</h2>
 
 <form asp-action="Create" method="post">
     <label>Nombre</label>
