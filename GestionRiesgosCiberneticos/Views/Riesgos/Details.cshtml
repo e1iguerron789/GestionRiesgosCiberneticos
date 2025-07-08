@@ -1,0 +1,37 @@
+﻿@model CyberRiskManager.Models.Riesgo
+@{
+    ViewData["Title"] = "Detalle del Riesgo";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="mb-3">
+    <strong>Activo:</strong> @ViewBag.NombreActivo (@ViewBag.TipoActivo)<br />
+    <strong>Amenaza:</strong> @Model.Amenaza<br />
+    <strong>Vulnerabilidad:</strong> @Model.Vulnerabilidad<br />
+    <strong>Nivel de Riesgo:</strong> @Model.NivelRiesgo (@Model.Prioridad)<br />
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Estrategia))
+{
+    <h4>Tratamiento Aplicado</h4>
+    <p><strong>Estrategia:</strong> @Model.Estrategia</p>
+    <p><strong>Justificación:</strong><br />@Model.JustificacionTratamiento</p>
+
+    <p><strong>Controles Propuestos:</strong></p>
+    <ol>
+        @foreach (var ctrl in Model.ControlesPropuestos)
+        {
+            <li>@ctrl</li>
+        }
+    </ol>
+
+    <p><strong>Responsable:</strong> @Model.Responsable</p>
+    <p><strong>Fecha Objetivo:</strong> @Model.FechaObjetivo?.ToShortDateString()</p>
+}
+else
+{
+    <div class="alert alert-warning">⚠️ Este riesgo aún no tiene tratamiento aplicado.</div>
+}
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

@@ -17,6 +17,7 @@
             <th>Controles</th>
             <th>Riesgo</th>
             <th>Prioridad</th>
+            <th>Tratamiento</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -35,9 +36,20 @@
                 <td><span class="badge bg-@color">@r.NivelRiesgo</span></td>
                 <td>@r.Prioridad</td>
                 <td>
+                    @if (!string.IsNullOrEmpty(r.Estrategia))
+                    {
+                        <span class="badge bg-info">@r.Estrategia</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Pendiente</span>
+                    }
+                </td>
+                <td>
                     <a asp-action="Edit" asp-route-id="@r.Id" class="btn btn-sm btn-outline-warning me-1">✏️</a>
                     <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-sm btn-outline-danger me-1">🗑️</a>
-                    <a asp-action="Tratamiento" asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary">🛠️</a>
+                    <a asp-action="Tratamiento" asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary me-1">🛠️</a>
+                    <a asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-outline-info">🔍</a>
                 </td>
             </tr>
         }

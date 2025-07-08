@@ -169,5 +169,17 @@ namespace CyberRiskManager.Controllers
             _mongo.UpdateRiesgo(original);
             return RedirectToAction(nameof(Index));
         }
+        public IActionResult Details(string id)
+        {
+            var riesgo = _mongo.GetRiesgos().FirstOrDefault(r => r.Id == id);
+            if (riesgo == null) return NotFound();
+
+            var activo = _mongo.GetById(riesgo.ActivoId);
+            ViewBag.NombreActivo = activo?.Nombre ?? "(desconocido)";
+            ViewBag.TipoActivo = activo?.Tipo.ToString() ?? "";
+
+            return View(riesgo);
+        }
+
     }
 }
