@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Lista de Riesgos";
     var activos = ViewBag.Activos as Dictionary<string, string>;
+    var heatmap = ViewBag.Heatmap as int[,];
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -37,6 +38,40 @@
                     <a asp-action="Edit" asp-route-id="@r.Id" class="btn btn-sm btn-outline-warning me-1">✏️</a>
                     <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-sm btn-outline-danger">🗑️</a>
                 </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h3 class="mt-5">Mapa de calor de riesgos (Probabilidad × Impacto)</h3>
+<table class="table table-bordered text-center w-auto">
+    <thead class="table-light">
+        <tr>
+            <th>PxI</th>
+            <th>Impacto 1</th>
+            <th>Impacto 2</th>
+            <th>Impacto 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int p = 1; p <= 3; p++)
+        {
+            <tr>
+                <th class="table-light">Probabilidad @p</th>
+                @for (int i = 1; i <= 3; i++)
+                {
+                    int count = heatmap?[p, i] ?? 0;
+                    string color = count switch
+                    {
+                        >= 5 => "bg-danger text-white",
+                        >= 3 => "bg-warning text-dark",
+                        >= 1 => "bg-success text-white",
+                        _ => "bg-light text-muted"
+                    };
+                    <td class="@color">@count</td>
+                }
             </tr>
         }
     </tbody>

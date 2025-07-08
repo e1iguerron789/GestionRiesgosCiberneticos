@@ -20,8 +20,21 @@ namespace CyberRiskManager.Controllers
             var activos = _mongo.GetAll();
 
             ViewBag.Activos = activos.ToDictionary(a => a.Id, a => a.Nombre);
+
+            // Crear matriz 3x3 para mapa de calor
+            int[,] heatmap = new int[4, 4]; // índice 1-3 para P e I
+            foreach (var r in riesgos)
+            {
+                if (r.Probabilidad >= 1 && r.Probabilidad <= 3 && r.Impacto >= 1 && r.Impacto <= 3)
+                {
+                    heatmap[r.Probabilidad, r.Impacto]++;
+                }
+            }
+            ViewBag.Heatmap = heatmap;
+
             return View(riesgos);
         }
+
 
         public IActionResult Create()
         {
