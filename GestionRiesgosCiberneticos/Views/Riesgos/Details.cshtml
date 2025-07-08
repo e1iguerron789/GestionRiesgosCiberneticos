@@ -1,4 +1,6 @@
 ﻿@model CyberRiskManager.Models.Riesgo
+@using CyberRiskManager.Models
+
 @{
     ViewData["Title"] = "Detalle del Riesgo";
 }
@@ -15,6 +17,7 @@
 @if (!string.IsNullOrEmpty(Model.Estrategia))
 {
     <h4>Tratamiento Aplicado</h4>
+    <p><strong>Riesgo Residual:</strong> @Model.RiesgoResidual</p>
     <p><strong>Estrategia:</strong> @Model.Estrategia</p>
     <p><strong>Justificación:</strong><br />@Model.JustificacionTratamiento</p>
 
@@ -33,5 +36,34 @@ else
 {
     <div class="alert alert-warning">⚠️ Este riesgo aún no tiene tratamiento aplicado.</div>
 }
+<hr />
+<h4>📌 Observaciones o Recomendaciones</h4>
+
+<form asp-action="AgregarObservacion" method="post">
+    <input type="hidden" name="RiesgoId" value="@Model.Id" />
+    <div class="mb-2">
+        <textarea name="Texto" class="form-control" rows="3" placeholder="Escribe una observación..."></textarea>
+    </div>
+    <button class="btn btn-primary btn-sm">Guardar observación</button>
+</form>
+
+@if (ViewBag.Observaciones is List<Observacion> obs && obs.Any())
+{
+    <ul class="list-group mt-3">
+        @foreach (var o in obs.OrderByDescending(o => o.Fecha))
+        {
+            <li class="list-group-item">
+                <strong>@o.Autor</strong> (@o.Fecha.ToShortDateString()):<br />
+                @o.Texto
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">Sin observaciones aún.</p>
+}
+
 
 <a asp-action="Index" class="btn btn-secondary">Volver</a>
+

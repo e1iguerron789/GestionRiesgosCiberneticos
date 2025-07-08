@@ -11,12 +11,14 @@
 <form asp-action="Create" method="post">
     <div class="mb-3">
         <label>Activo afectado</label>
-        <select asp-for="ActivoId" class="form-select" id="activoSelect">
+        <select asp-for="ActivoId" class="form-select" id="activoSelect" required>
             @foreach (var a in activos!)
             {
-                <option value="@a.Id">@a.Nombre</option>
+                var selected = a == activos.First() ? "selected" : "";
+                <option value="@a.Id" selected="@selected">@a.Nombre</option>
             }
         </select>
+        <span asp-validation-for="ActivoId" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
@@ -120,7 +122,6 @@
             }
         }
 
-        // Autocompletado con despliegue automático al enfocar
         $(function () {
             const $input = $("#ControlesExistentes");
 

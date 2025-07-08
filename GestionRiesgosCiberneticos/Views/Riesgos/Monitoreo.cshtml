@@ -1,0 +1,40 @@
+﻿@model List<CyberRiskManager.Models.Riesgo>
+@{
+    ViewData["Title"] = "Monitoreo de Riesgos";
+    var activos = ViewBag.Activos as Dictionary<string, string>;
+}
+
+<h2>@ViewData["Title"]</h2>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Activo</th>
+            <th>Amenaza</th>
+            <th>Vulnerabilidad</th>
+            <th>Riesgo Inicial</th>
+            <th>Residual</th>
+            <th>Estrategia</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            var nombre = activos != null && activos.ContainsKey(r.ActivoId) ? activos[r.ActivoId] : "(?)";
+            var color = r.RiesgoResidual >= 7 ? "danger"
+            : r.RiesgoResidual >= 4 ? "warning"
+            : "success";
+            <tr>
+                <td>@nombre</td>
+                <td>@r.Amenaza</td>
+                <td>@r.Vulnerabilidad</td>
+                <td>@r.NivelRiesgo</td>
+                <td><span class="badge bg-@color">@r.RiesgoResidual</span></td>
+                <td>@(string.IsNullOrWhiteSpace(r.Estrategia) ? "❌" : r.Estrategia)</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@r.Id">Ver</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,7 +1,9 @@
-﻿using MongoDB.Driver;
+﻿using CyberRiskManager.Models;
 using CyberRiskManager.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
+
 
 namespace CyberRiskManager.Data
 {
@@ -10,6 +12,8 @@ namespace CyberRiskManager.Data
         private readonly ILogger<MongoService> _logger;
         private readonly IMongoCollection<Activo> _activos;
         private readonly IMongoCollection<Riesgo> _riesgos;
+        private readonly IMongoCollection<Observacion> _observaciones;
+
 
         public MongoService(IConfiguration config, ILogger<MongoService> logger)
         {
@@ -47,7 +51,11 @@ namespace CyberRiskManager.Data
         public List<Riesgo> GetRiesgosPorActivo(string activoId) =>
             _riesgos.Find(r => r.ActivoId == activoId).ToList();
 
-        public void AddRiesgo(Riesgo riesgo) => _riesgos.InsertOne(riesgo);
+        public void AddRiesgo(Riesgo riesgo)
+        {
+            _logger.LogInformation("Insertando riesgo: {@riesgo}", riesgo);
+            _riesgos.InsertOne(riesgo);
+        }
 
         public void UpdateRiesgo(Riesgo riesgo)
         {
@@ -73,6 +81,10 @@ namespace CyberRiskManager.Data
                 .ToList();
         }
 
+        public void AgregarObservacion(Observacion o) => _observaciones.InsertOne(o);
+
+        public List<Observacion> GetObservacionesPorRiesgo(string riesgoId) =>
+            _observaciones.Find(o => o.RiesgoId == riesgoId).ToList();
 
 
 

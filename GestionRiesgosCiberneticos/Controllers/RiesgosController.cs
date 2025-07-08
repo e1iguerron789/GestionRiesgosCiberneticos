@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CyberRiskManager.Data;
+﻿using CyberRiskManager.Data;
 using CyberRiskManager.Models;
 using CyberRiskManager.Services;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 
 namespace CyberRiskManager.Controllers
 {
@@ -44,14 +45,21 @@ namespace CyberRiskManager.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Riesgo riesgo)
         {
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Activos = _mongo.GetAll();
                 return View(riesgo);
             }
+            
+            if (!ObjectId.TryParse(riesgo.ActivoId, out _))
+            {
+                ModelState.AddModelError("ActivoId", "❌ Debes seleccionar un activo válido.");
+            }
 
             _mongo.AddRiesgo(riesgo);
             return RedirectToAction(nameof(Index));
+
         }
 
         [HttpGet]
@@ -166,9 +174,17 @@ namespace CyberRiskManager.Controllers
             original.FechaObjetivo = riesgo.FechaObjetivo;
             original.JustificacionTratamiento = riesgo.JustificacionTratamiento;
 
+            // ✅ Cálculo automático de riesgo residual
+            int riesgoInicial = original.Probabilidad * original.Impacto;
+            int cantidadControles = original.ControlesPropuestos.Count;
+            int reduccion = Math.Min(cantidadControles, 3); // máximo 3 de reducción
+            original.RiesgoResidual = Math.Max(riesgoInicial - reduccion, 1); // mínimo 1
+
             _mongo.UpdateRiesgo(original);
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Details), new { id = original.Id });
         }
+
         public IActionResult Details(string id)
         {
             var riesgo = _mongo.GetRiesgos().FirstOrDefault(r => r.Id == id);
@@ -177,8 +193,62 @@ namespace CyberRiskManager.Controllers
             var activo = _mongo.GetById(riesgo.ActivoId);
             ViewBag.NombreActivo = activo?.Nombre ?? "(desconocido)";
             ViewBag.TipoActivo = activo?.Tipo.ToString() ?? "";
+            ViewBag.Observaciones = _mongo.GetObservacionesPorRiesgo(id);
 
             return View(riesgo);
+        }
+
+
+        public IActionResult TestInsert()
+        {
+            var riesgo = new Riesgo
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                ActivoId = "66ae4565b486f79d14a12345", // ← USA un ObjectId válido que ya exista en tu colección Activos
+                Amenaza = "Prueba directa",
+                Vulnerabilidad = "Falta de prueba",
+                ControlesExistentes = "Control X",
+                Probabilidad = 2,
+                Impacto = 2,
+                Estrategia = "Mitigar",
+                Responsable = "Prueba",
+                FechaObjetivo = DateTime.UtcNow.AddDays(30),
+                JustificacionTratamiento = "Solo prueba"
+            };
+
+            try
+            {
+                _mongo.AddRiesgo(riesgo);
+                return Content("✅ Riesgo de prueba insertado.");
+            }
+            catch (Exception ex)
+            {
+                return Content($"❌ ERROR: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult AgregarObservacion(string RiesgoId, string Texto)
+        {
+            if (!string.IsNullOrWhiteSpace(Texto))
+            {
+                var obs = new Observacion
+                {
+                    RiesgoId = RiesgoId,
+                    Texto = Texto,
+                    Autor = User.Identity?.Name ?? "Anonimo"
+                };
+                _mongo.AgregarObservacion(obs);
+            }
+            return RedirectToAction("Details", new { id = RiesgoId });
+        }
+
+        public IActionResult Monitoreo()
+        {
+            var riesgos = _mongo.GetRiesgos();
+            var activos = _mongo.GetAll().ToDictionary(a => a.Id, a => a.Nombre);
+            ViewBag.Activos = activos;
+            return View(riesgos);
         }
 
     }

@@ -7,7 +7,7 @@ namespace CyberRiskManager.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = "";
+        public string Id { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string ActivoId { get; set; } = "";
@@ -24,7 +24,9 @@ namespace CyberRiskManager.Models
         public string Responsable { get; set; }
         public DateTime? FechaObjetivo { get; set; }
         public string JustificacionTratamiento { get; set; }
-
+        public int RiesgoResidual { get; set; } = 0;
+        
+        
         [BsonIgnore]
         public int NivelRiesgo => Probabilidad * Impacto;
 
