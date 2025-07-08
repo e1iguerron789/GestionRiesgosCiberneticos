@@ -46,5 +46,16 @@ namespace CyberRiskManager.Data
             _riesgos.Find(r => r.ActivoId == activoId).ToList();
 
         public void AddRiesgo(Riesgo riesgo) => _riesgos.InsertOne(riesgo);
+
+        public void UpdateRiesgo(Riesgo riesgo)
+        {
+            _riesgos.ReplaceOne(r => r.Id == riesgo.Id, riesgo);
+        }
+
+        public void DeleteRiesgo(string id)
+        {
+            _riesgos.DeleteOne(r => r.Id == id);
+        }
+
     }
 }

@@ -2,7 +2,7 @@
 @using CyberRiskManager.Models
 
 @{
-    ViewData["Title"] = "Registrar riesgo";
+    ViewData["Title"] = "Registrar nuevo riesgo";
     var activos = ViewBag.Activos as List<Activo>;
 }
 
@@ -11,7 +11,7 @@
 <form asp-action="Create" method="post">
     <div class="mb-3">
         <label>Activo afectado</label>
-        <select asp-for="ActivoId" class="form-select">
+        <select asp-for="ActivoId" class="form-select" id="activoSelect">
             @foreach (var a in activos!)
             {
                 <option value="@a.Id">@a.Nombre</option>
@@ -20,46 +20,100 @@
     </div>
 
     <div class="mb-3">
-        <label>Amenaza</label>
-        <input asp-for="Amenaza" class="form-control" />
+        <button type="button" class="btn btn-outline-info" onclick="usarIA()">🔍 Sugerir amenazas y vulnerabilidades con IA</button>
     </div>
 
     <div class="mb-3">
-        <label>Vulnerabilidad</label>
-        <input asp-for="Vulnerabilidad" class="form-control" />
+        <label>Amenaza sugerida</label>
+        <select asp-for="Amenaza" id="Amenaza" class="form-select">
+            <option>-- Selecciona o usa IA --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Vulnerabilidad sugerida</label>
+        <select asp-for="Vulnerabilidad" id="Vulnerabilidad" class="form-select">
+            <option>-- Selecciona o usa IA --</option>
+        </select>
     </div>
 
     <div class="mb-3">
         <label>Controles existentes</label>
-        <textarea asp-for="ControlesExistentes" class="form-control"></textarea>
+        <textarea asp-for="ControlesExistentes" class="form-control" rows="3"></textarea>
     </div>
 
     <div class="row mb-3">
         <div class="col">
             <label>Probabilidad</label>
-            <input asp-for="Probabilidad" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'p')" />
-            <span id="label-p">Media</span>
+            <input asp-for="Probabilidad" id="Probabilidad" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'p')" />
+            <span id="label-p">Media 🟠</span>
         </div>
         <div class="col">
             <label>Impacto</label>
-            <input asp-for="Impacto" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'i')" />
-            <span id="label-i">Media</span>
+            <input asp-for="Impacto" id="Impacto" type="range" min="1" max="3" class="form-range" oninput="updateLabel(this,'i')" />
+            <span id="label-i">Media 🟠</span>
         </div>
     </div>
 
-    <button class="btn btn-success">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
 
 @section Scripts {
     <script>
         const etiquetas = { 1: 'Baja 🟢', 2: 'Media 🟠', 3: 'Alta 🔴' };
+
         function updateLabel(input, id) {
-            document.getElementById('label-' + id).innerText = etiquetas[input.value];
+            const span = document.getElementById('label-' + id);
+            if (input && span) {
+                span.innerText = etiquetas[input.value];
+            }
         }
+
         document.addEventListener('DOMContentLoaded', () => {
-            updateLabel(document.querySelector('[asp-for="Probabilidad"]'), 'p');
-            updateLabel(document.querySelector('[asp-for="Impacto"]'), 'i');
+            updateLabel(document.getElementById("Probabilidad"), 'p');
+            updateLabel(document.getElementById("Impacto"), 'i');
         });
+
+        async function usarIA() {
+            const select = document.getElementById('activoSelect');
+            if (!select) return;
+
+            const selectedValue = select.value;
+            const selectedText = select.options[select.selectedIndex].text;
+
+            try {
+                const res = await fetch(`/Riesgos/SugerenciasIA?activoId=${selectedValue}&activoNombre=${encodeURIComponent(selectedText)}`);
+                const data = await res.json();
+
+                if (!data.amenazas || !data.vulnerabilidades) {
+                    throw new Error("Respuesta inválida");
+                }
+
+                const amenazaSel = document.getElementById("Amenaza");
+                const vulnerabilidadSel = document.getElementById("Vulnerabilidad");
+
+                amenazaSel.innerHTML = "";
+                vulnerabilidadSel.innerHTML = "";
+
+                data.amenazas.forEach(a => {
+                    const opt = document.createElement("option");
+                    opt.textContent = a;
+                    opt.value = a;
+                    amenazaSel.appendChild(opt);
+                });
+
+                data.vulnerabilidades.forEach(v => {
+                    const opt = document.createElement("option");
+                    opt.textContent = v;
+                    opt.value = v;
+                    vulnerabilidadSel.appendChild(opt);
+                });
+
+            } catch (err) {
+                console.error("Error IA:", err);
+                alert("❌ Error al obtener sugerencias de IA.");
+            }
+        }
     </script>
 }

@@ -1,0 +1,21 @@
+﻿@model CyberRiskManager.Models.Riesgo
+
+<h2>¿Eliminar Riesgo?</h2>
+
+<div class="alert alert-danger">
+    ¿Estás seguro de que deseas eliminar este riesgo?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Amenaza</dt>
+    <dd class="col-sm-9">@Model.Amenaza</dd>
+
+    <dt class="col-sm-3">Vulnerabilidad</dt>
+    <dd class="col-sm-9">@Model.Vulnerabilidad</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button class="btn btn-danger">Sí, eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>

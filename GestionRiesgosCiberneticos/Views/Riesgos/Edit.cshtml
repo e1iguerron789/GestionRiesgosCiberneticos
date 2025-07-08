@@ -1,0 +1,53 @@
+﻿@model CyberRiskManager.Models.Riesgo
+@using CyberRiskManager.Models
+
+@{
+    ViewData["Title"] = "Editar riesgo";
+    var activos = ViewBag.Activos as List<Activo>;
+}
+
+<h2>Editar Riesgo</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label>Activo afectado</label>
+        <select asp-for="ActivoId" class="form-select">
+            @foreach (var a in activos!)
+            {
+                <option value="@a.Id" selected="@(a.Id == Model.ActivoId)">
+                    @a.Nombre
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Amenaza</label>
+        <input asp-for="Amenaza" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Vulnerabilidad</label>
+        <input asp-for="Vulnerabilidad" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Controles existentes</label>
+        <textarea asp-for="ControlesExistentes" class="form-control"></textarea>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label>Probabilidad</label>
+            <input asp-for="Probabilidad" type="range" min="1" max="3" class="form-range" />
+        </div>
+        <div class="col">
+            <label>Impacto</label>
+            <input asp-for="Impacto" type="range" min="1" max="3" class="form-range" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>

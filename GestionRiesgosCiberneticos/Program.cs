@@ -1,13 +1,16 @@
 using CyberRiskManager.Data;
+using CyberRiskManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Servicios
+builder.Services.AddSingleton<IAService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<MongoService>();
 builder.Services.AddLogging();
 
 var app = builder.Build();
+
 
 // Pipeline
 if (!app.Environment.IsDevelopment())

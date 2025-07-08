@@ -29,9 +29,9 @@ namespace CyberRiskManager.Models
             {
                 // Sugerencia básica de prioridad
                 if (NivelRiesgo >= 7)
-                    return "Alta prioridad 🔥";
+                    return "Alta prioridad ";
                 else if (NivelRiesgo >= 4)
-                    return "Media prioridad ⚠️";
+                    return "Media prioridad ";
                 else
                     return "Baja prioridad ✅";
             }
