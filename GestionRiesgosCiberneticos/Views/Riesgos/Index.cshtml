@@ -14,7 +14,7 @@
             <th>Activo</th>
             <th>Amenaza</th>
             <th>Vulnerabilidad</th>
-            <th>Controles</th>
+           
             <th>Riesgo</th>
             <th>Prioridad</th>
             <th>Tratamiento</th>
@@ -32,7 +32,7 @@
                 <td>@activo</td>
                 <td>@r.Amenaza</td>
                 <td>@r.Vulnerabilidad</td>
-                <td>@r.ControlesExistentes</td>
+                
                 <td><span class="badge bg-@color">@r.NivelRiesgo</span></td>
                 <td>@r.Prioridad</td>
                 <td>
@@ -46,7 +46,7 @@
                     }
                 </td>
                 <td>
-                    
+                   
                     <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-sm btn-outline-danger me-1">🗑️</a>
                     <a asp-action="Tratamiento" asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary me-1">🛠️</a>
                     <a asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-outline-info">🔍</a>

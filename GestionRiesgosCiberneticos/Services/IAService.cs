@@ -70,7 +70,7 @@ Devuelve solo este JSON:
             var prompt = $@"
 Eres un asesor experto en ciberseguridad. Analiza el siguiente riesgo y recomienda:
 
-1. La estrategia de tratamiento más adecuada (Mitigar, Transferir, Aceptar o Evitar), basada en el tipo de activo, su criticidad y el nivel de riesgo.
+1. Recomienda La estrategia de tratamiento más adecuada entre estas segun el caso , recuerda no siempre debe de ser mitigar (Mitigar, Transferir, Aceptar o Evitar), basada en el tipo de activo, su criticidad y el nivel de riesgo.
 2. Justifica por qué esa estrategia es la mejor opción en este contexto.
 3. Sugiere 5 controles específicos que deberían implementarse. Para cada uno:
    - Explica la acción concreta.
