@@ -36,7 +36,8 @@
                 <td>@r.Prioridad</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@r.Id" class="btn btn-sm btn-outline-warning me-1">✏️</a>
-                    <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-sm btn-outline-danger">🗑️</a>
+                    <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-sm btn-outline-danger me-1">🗑️</a>
+                    <a asp-action="Tratamiento" asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary">🛠️</a>
                 </td>
             </tr>
         }

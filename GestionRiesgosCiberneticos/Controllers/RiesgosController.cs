@@ -21,8 +21,7 @@ namespace CyberRiskManager.Controllers
 
             ViewBag.Activos = activos.ToDictionary(a => a.Id, a => a.Nombre);
 
-            // Crear matriz 3x3 para mapa de calor
-            int[,] heatmap = new int[4, 4]; // índice 1-3 para P e I
+            int[,] heatmap = new int[4, 4];
             foreach (var r in riesgos)
             {
                 if (r.Probabilidad >= 1 && r.Probabilidad <= 3 && r.Impacto >= 1 && r.Impacto <= 3)
@@ -34,7 +33,6 @@ namespace CyberRiskManager.Controllers
 
             return View(riesgos);
         }
-
 
         public IActionResult Create()
         {
@@ -55,7 +53,6 @@ namespace CyberRiskManager.Controllers
             _mongo.AddRiesgo(riesgo);
             return RedirectToAction(nameof(Index));
         }
-
 
         [HttpGet]
         public async Task<IActionResult> SugerenciasIA(string activoId, string activoNombre)
@@ -82,7 +79,7 @@ namespace CyberRiskManager.Controllers
                 return StatusCode(500, new { error = "Fallo interno", detalle = ex.Message });
             }
         }
-        // GET: Riesgos/Edit/5
+
         public IActionResult Edit(string id)
         {
             var riesgo = _mongo.GetRiesgos().FirstOrDefault(r => r.Id == id);
@@ -93,7 +90,6 @@ namespace CyberRiskManager.Controllers
             return View(riesgo);
         }
 
-        // POST: Riesgos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(string id, Riesgo riesgo)
@@ -111,7 +107,6 @@ namespace CyberRiskManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Riesgos/Delete/5
         public IActionResult Delete(string id)
         {
             var riesgo = _mongo.GetRiesgos().FirstOrDefault(r => r.Id == id);
@@ -121,7 +116,6 @@ namespace CyberRiskManager.Controllers
             return View(riesgo);
         }
 
-        // POST: Riesgos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(string id)
@@ -130,6 +124,50 @@ namespace CyberRiskManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public IActionResult SugerirControles(string term)
+        {
+            var sugerencias = _mongo.ObtenerControlesExistentesSugeridos(term);
+            return Json(sugerencias);
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> Tratamiento(string id)
+        {
+            var riesgo = _mongo.GetRiesgos().FirstOrDefault(r => r.Id == id);
+            if (riesgo == null) return NotFound();
+
+            var activo = _mongo.GetById(riesgo.ActivoId);
+            if (activo == null) return NotFound();
+
+            var ia = HttpContext.RequestServices.GetRequiredService<IAService>();
+
+            // 👇 Aquí corregimos: desestructuramos la tupla correctamente
+            var (estrategia, justificacion, controles) = await ia.GenerarTratamientoIAAsync(riesgo, activo);
+
+            riesgo.Estrategia = estrategia;
+            riesgo.JustificacionTratamiento = justificacion;
+            riesgo.ControlesPropuestos = controles;
+
+            return View(riesgo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GuardarTratamiento(string id, Riesgo riesgo, List<string> ControlesPropuestos)
+        {
+            var original = _mongo.GetRiesgos().FirstOrDefault(r => r.Id == id);
+            if (original == null)
+                return NotFound();
+
+            original.Estrategia = riesgo.Estrategia;
+            original.ControlesPropuestos = ControlesPropuestos ?? new();
+            original.Responsable = riesgo.Responsable;
+            original.FechaObjetivo = riesgo.FechaObjetivo;
+            original.JustificacionTratamiento = riesgo.JustificacionTratamiento;
+
+            _mongo.UpdateRiesgo(original);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

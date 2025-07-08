@@ -39,7 +39,7 @@
 
     <div class="mb-3">
         <label>Controles existentes</label>
-        <textarea asp-for="ControlesExistentes" class="form-control" rows="3"></textarea>
+        <input asp-for="ControlesExistentes" id="ControlesExistentes" class="form-control" autocomplete="off" />
     </div>
 
     <div class="row mb-3">
@@ -60,6 +60,10 @@
 </form>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+
     <script>
         const etiquetas = { 1: 'Baja 🟢', 2: 'Media 🟠', 3: 'Alta 🔴' };
 
@@ -115,5 +119,22 @@
                 alert("❌ Error al obtener sugerencias de IA.");
             }
         }
+
+        // Autocompletado con despliegue automático al enfocar
+        $(function () {
+            const $input = $("#ControlesExistentes");
+
+            $input.autocomplete({
+                source: function (req, res) {
+                    $.getJSON('/Riesgos/SugerirControles', { term: req.term }, res);
+                },
+                minLength: 0,
+                delay: 150
+            });
+
+            $input.on("focus", function () {
+                $(this).autocomplete("search", "");
+            });
+        });
     </script>
 }

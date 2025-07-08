@@ -29,7 +29,9 @@ namespace CyberRiskManager.Data
                 _logger.LogError(ex, "Error conectando a MongoDB");
                 throw;
             }
+            
         }
+        
 
         public List<Activo> GetAll() => _activos.Find(a => true).ToList();
         public Activo? GetById(string id) => _activos.Find(a => a.Id == id).FirstOrDefault();
@@ -56,6 +58,24 @@ namespace CyberRiskManager.Data
         {
             _riesgos.DeleteOne(r => r.Id == id);
         }
+
+        public List<string> ObtenerControlesExistentesSugeridos(string filtro)
+        {
+            if (string.IsNullOrWhiteSpace(filtro))
+                filtro = "";
+
+            var riesgos = _riesgos.Find(_ => true).ToList();
+            return riesgos
+                .Select(r => r.ControlesExistentes)
+                .Where(c => !string.IsNullOrWhiteSpace(c) && c.ToLower().Contains(filtro.ToLower()))
+                .Distinct()
+                .Take(10)
+                .ToList();
+        }
+
+
+
+
 
     }
 }

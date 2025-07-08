@@ -19,6 +19,12 @@ namespace CyberRiskManager.Models
         public int Probabilidad { get; set; } = 2;  // 1 a 3
         public int Impacto { get; set; } = 2;       // 1 a 3
 
+        public string Estrategia { get; set; }
+        public List<string> ControlesPropuestos { get; set; } = new();
+        public string Responsable { get; set; }
+        public DateTime? FechaObjetivo { get; set; }
+        public string JustificacionTratamiento { get; set; }
+
         [BsonIgnore]
         public int NivelRiesgo => Probabilidad * Impacto;
 
